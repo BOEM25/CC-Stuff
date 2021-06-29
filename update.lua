@@ -1,15 +1,17 @@
 args = {...}
-utils = {}
+utils = {} -- Table of utility functions
 
 -- Link to json library to download if not downladed
 jsonLibLink = "https://raw.githubusercontent.com/rxi/json.lua/master/json.lua"
 
--- Table of gist id's for programs/scripts to download
-files = {["miner"]=nil, ["farmer"]=nil, ["storage"]=nil, ["cs"]=nil, ["phone"]=nil, ["test"]=nil} -- yes, i know its possible without [""] but it looks cool oke ;)
+
+-- Table of gist id's for programs/scripts to download, 
+-- make dynamic using webrequests???
+files = {["miner"]="ee7408d82e045a1a881849d502a2c60a", ["farmer"]=nil, ["storage"]=nil, ["cs"]=nil, ["phone"]=nil, ["test"]=nil} -- yes, i know its possible without [""] but it looks cool oke ;)
 
 -- Simple function to check if a value is in a table
 function utils:checkInTable(set, key)
-    for index, item in ipairs() do
+    for index, item in ipairs(set) do
         if item == key then
             return true
         end
@@ -19,7 +21,7 @@ end
 
 -- Simple function to check for a key in a table
 function utils:checkInPairsTable(set, key)
-    for index, item in pairs() do
+    for index, item in pairs(set) do
         if index == key then
             return true
         end
@@ -38,6 +40,7 @@ end
 -- Check if the json libary is downloaded, if so then check for updates, if not then download it
 function utils:checkIfJsonExists()
     -- TODO: Make more dynamic if other libaries needed!
+    -- Using a table and a for loop?
 
     if fs.exists("json.lua") then -- If json lib already exists
         print("Json Exists")
@@ -92,23 +95,20 @@ function utils:downloadGistToFile(gistID)
         return false
     end
 
-    -- want to get the first item in the files list, probably a better way to do but hey, it works :)
-    numberIndex = 1
-    for index, item in pairs(jData["files"]) do
-        if numberIndex == 1 then
-            content, reason = http.get(item["raw_url"])
-            if content ~= nil then
-                local data = {content = content.readAll(), size = item["size"], filename = item["filename"]}
-                utils.writeToFile(self, data.filename, data.content)
-                print("Downloaded "..data.filename..", size: "..data.size.."b")
-                return true
-            else
-                error("Error getting gist! Reason: "..reason)
-                return false
-            end
+    for index, item in pairs(jData["files"]) do 
+        print("Downloading "..item["filename"])
+        content, reason = http.get(item["raw_url"])
+        if content ~= nil then
+            local data = {content = content.readAll(), size = item["size"], filename = item["filename"]}
+            utils.writeToFile(self, data.filename, data.content)
+            print("Downloaded "..data.filename..", size: "..data.size.."b")
+        else
+            error("Error getting gist! Reason: "..reason)
+            return false
         end
-        numberIndex = numberIndex + 1
     end
+    
+    return true
 end
 
 -- Load json libary with check if it exists
@@ -119,6 +119,9 @@ if utils.checkIfJsonExists() then
     end
 end
 
-
-id = "bcf3970b2edb26aa234463fca70f3d94"
-print(utils.downloadGistToFile(self, id))
+if utils.checkInPairsTable(self, files, args[1]) then
+    id = files[args[1]]
+    utils.downloadGistToFile(self, id)
+else
+    print("All files are: ??")
+end
