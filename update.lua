@@ -1,9 +1,13 @@
 args = {...}
 utils = {}
 
+-- Link to json library to download if not downladed
 jsonLibLink = "https://raw.githubusercontent.com/rxi/json.lua/master/json.lua"
+
+-- Table of gist id's for programs/scripts to download
 files = {["miner"]=nil, ["farmer"]=nil, ["storage"]=nil, ["cs"]=nil, ["phone"]=nil, ["test"]=nil} -- yes, i know its possible without [""] but it looks cool oke ;)
 
+-- Simple function to check if a value is in a table
 function utils:checkInTable(set, key)
     for index, item in ipairs() do
         if item == key then
@@ -13,6 +17,7 @@ function utils:checkInTable(set, key)
     return false
 end
 
+-- Simple function to check for a key in a table
 function utils:checkInPairsTable(set, key)
     for index, item in pairs() do
         if index == key then
@@ -22,6 +27,7 @@ function utils:checkInPairsTable(set, key)
     return false
 end
 
+-- Simple function to (over)write a file 
 function utils:writeToFile(file, data)
     local file = fs.open(file, "w")
     file.write(data)
@@ -29,6 +35,7 @@ function utils:writeToFile(file, data)
     return true
 end
 
+-- Check if the json libary is downloaded, if so then check for updates, if not then download it
 function utils:checkIfJsonExists()
     -- TODO: Make more dynamic if other libaries needed!
 
@@ -71,6 +78,7 @@ function utils:checkIfJsonExists()
     return true
 end
 
+-- Function which takes in a gist id and downloads it
 function utils:downloadGistToFile(gistID)
     if gistID == nil then
         return false
@@ -103,9 +111,10 @@ function utils:downloadGistToFile(gistID)
     end
 end
 
+-- Load json libary with check if it exists
 if utils.checkIfJsonExists() then
     json = require "json"
-    if json == nil then
+    if json == nil then -- not needed?
         error("Error occured during load of json")
     end
 end
