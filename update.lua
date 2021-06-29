@@ -7,7 +7,7 @@ jsonLibLink = "https://raw.githubusercontent.com/rxi/json.lua/master/json.lua"
 
 -- Table of gist id's for programs/scripts to download, 
 -- make dynamic using webrequests???
-files = {["miner"]="ee7408d82e045a1a881849d502a2c60a", ["farmer"]=nil, ["storage"]=nil, ["cs"]=nil, ["phone"]=nil, ["test"]=nil} -- yes, i know its possible without [""] but it looks cool oke ;)
+files = {["miner"]="5fb47245f0861609b24d81f18b9ef569", ["farmer"]="4e39ce6ed3a884d999c5705adbf5c8bc", ["storage"]=nil, ["cs"]=nil, ["phone"]=nil, ["test"]=nil} -- yes, i know its possible without [""] but it looks cool oke ;)
 
 -- Simple function to check if a value is in a table
 function utils:checkInTable(set, key)
