@@ -23,7 +23,7 @@ function utils:checkInPairsTable(set, key)
 end
 
 function utils:writeToFile(file, data)
-    file = fs.open(file, "w")
+    local file = fs.open(file, "w")
     file.write(data)
     file.close()
     return true
@@ -37,11 +37,11 @@ function utils:checkIfJsonExists()
 
         -- Check for updates
         print("Checking for updates for Json Library...")
-        response = http.get(jsonLibLink)
+        local response = http.get(jsonLibLink)
 
         if response ~= nil then -- request succesfull
-            data = response.readAll() -- Can only read once otherwise?
-            file = fs.open("json.lua", "r")
+            local data = response.readAll() -- Can only read once otherwise?
+            local file = fs.open("json.lua", "r")
             if file.readAll() ~= data then
                 file.close()
                 utils.writeToFile("json.lua", data)
@@ -55,13 +55,13 @@ function utils:checkIfJsonExists()
     else
         print("Json does not exists")
         print("Downloading json...")
-        response = http.get(jsonLibLink) -- request and get file
+        local response = http.get(jsonLibLink) -- request and get file
 
         if response ~= nil then -- Request succesfull
-            file = fs.open("json.lua", "w") -- Create file
+            local file = fs.open("json.lua", "w") -- Create file
             file.write(response.readAll()) -- Write raw data
             file.close() -- Close
-            print("Download succesfull! Json installed!")
+            print("Download succesfull, Json installed!")
 
         else
             print("Request failed, internet down?")
@@ -71,8 +71,45 @@ function utils:checkIfJsonExists()
     return true
 end
 
+function utils:downloadGistToFile(gistID)
+    if gistID == nil then
+        return false
+    end
+    print("Requesting gist..")
+    local link = "https://api.github.com/gists/"..gistID
+    local response = http.get(link)
+    if response ~= nil then
+        jData = json.decode(response.readAll())
+    else
+        return false
+    end
+
+    -- want to get the first item in the files list, probably a better way to do but hey, it works :)
+    numberIndex = 1
+    for index, item in pairs(jData["files"]) do
+        if numberIndex == 1 then
+            content, reason = http.get(item["raw_url"])
+            if content ~= nil then
+                local data = {content = content.readAll(), size = item["size"], filename = item["filename"]}
+                utils.writeToFile(self, data.filename, data.content)
+                print("Downloaded "..data.filename..", size: "..data.size.."b")
+                return true
+            else
+                error("Error getting gist! Reason: "..reason)
+                return false
+            end
+        end
+        numberIndex = numberIndex + 1
+    end
+end
+
 if utils.checkIfJsonExists() then
     json = require "json"
     if json == nil then
         error("Error occured during load of json")
+    end
 end
+
+
+id = "bcf3970b2edb26aa234463fca70f3d94"
+print(utils.downloadGistToFile(self, id))
